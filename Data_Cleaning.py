@@ -3,21 +3,35 @@ from io import StringIO
 from bs4 import BeautifulSoup
 import os
 from tqdm import tqdm
+import logging
+
+# Set up logging
+logging.basicConfig(
+    filename=os.path.join("Logs", "data_cleaning.log"),  # Log file name
+    filemode="a",  # Append mode, so logs are added to the file
+    level=logging.INFO,  # Logging level
+    format="%(asctime)s - %(levelname)s - %(message)s",  # Log message format
+    datefmt="%Y-%m-%d %H:%M:%S",  # Date format
+)
 
 
 def create_dataframe_from_html(file):
-    # Load the HTML file with the correct encoding
-    with open(file, "r", encoding="utf-8") as file:
-        html_content = file.read()
+    try:
+        # Load the HTML file with the correct encoding
+        with open(file, "r", encoding="utf-8") as file:
+            html_content = file.read()
 
-    # Parse the HTML content
-    soup = BeautifulSoup(html_content, "html.parser")
-    tables = soup.find_all("table")
+        # Parse the HTML content
+        soup = BeautifulSoup(html_content, "html.parser")
+        tables = soup.find_all("table")
 
-    # Convert the HTML table to a DataFrame
-    df = pd.read_html(StringIO(str(tables)))[0]
-
-    return df
+        # Convert the HTML table to a DataFrame
+        df = pd.read_html(StringIO(str(tables)))[0]
+        logging.info(f"DataFrame created from {file}")
+        return df
+    except Exception as e:
+        logging.error(f"Error creating DataFrame from {file}: {e}")
+        return None
 
 
 def clean_data(df, team):
@@ -113,26 +127,38 @@ def clean_data(df, team):
 
 def main():
     # Loop Through the Team Stats HTML Files
+    logging.info("Starting data cleaning process.")
     df_to_append = []
-    for file in tqdm(os.listdir("Team Stats HTML")):
-        # Create the file path
-        file_path = os.path.join("Team Stats HTML", file)
+    team = 'Unknown Team'
+    try:
+        for file in tqdm(os.listdir("Team Stats HTML")):
+            # Create the file path
+            file_path = os.path.join("Team Stats HTML", file)
 
-        # Isolate the team name from the file name
-        team = file.split("_")[1]
+            # Isolate the team name from the file name
+            team = file.split("_")[1]
 
-        # Create the DataFrame
-        df = create_dataframe_from_html(file_path)
+            logging.info(f"Creating DataFrame from HTML for {team}.")
+            
+            df = create_dataframe_from_html(file_path) # Create the DataFrame     
+            if df:      
+                df = clean_data(df, team) # Clean the data
+                df_to_append.append(df) # Append the DataFrame to the list
+                logging.info(f"Successfully cleaned data for {team}.")
 
-        #
-        df = clean_data(df, team)
-        df_to_append.append(df)
+    except Exception as e:
+        logging.error(f"An error occurred: {e} for {team}.  Data not cleaned or appended.")
+            
+    
+    try:
+        df = pd.concat(df_to_append)
+        df.to_excel("Team Stats 2023.xlsx", index=False)
+        logging.info("Successfully saved the consolidated DataFrame to Excel.")
 
-    # Concatenate the DataFrames
-    df = pd.concat(df_to_append)
+    except Exception as e:
+        logging.error(f"Error saving DataFrame to Excel: {e}")
 
-    # Save the DataFrame to an Excel file
-    df.to_excel("Team Stats 2023.xlsx", index=False)
+    logging.info("Data cleaning process completed.")
 
 
 if __name__ == "__main__":
