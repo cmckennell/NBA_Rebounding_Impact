@@ -137,11 +137,11 @@ def main():
 
             # Isolate the team name from the file name
             team = file.split("_")[1]
-
+            
             logging.info(f"Creating DataFrame from HTML for {team}.")
             
-            df = create_dataframe_from_html(file_path) # Create the DataFrame     
-            if df:      
+            df = create_dataframe_from_html(file_path) # Create the DataFrame   
+            if df is not None:  
                 df = clean_data(df, team) # Clean the data
                 df_to_append.append(df) # Append the DataFrame to the list
                 logging.info(f"Successfully cleaned data for {team}.")
