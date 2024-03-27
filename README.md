@@ -1,4 +1,4 @@
-# NBA Game Outcome Analysis: The Impact of Rebounds
+# NBA Game Outcome Analysis: The Impact of Non-Scoring Stats
 ## Overview
 This project analyzes how non scoring stat performance affects winning games in the National Basketball Association (NBA). By examining detailed game statistics, this analysis seeks to uncover the relationship between team performance and game outcomes.
 
