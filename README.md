@@ -1,6 +1,6 @@
 # NBA Game Outcome Analysis: The Impact of Rebounds
 ## Overview
-This project analyzes how team rebounding performance affects winning games in the National Basketball Association (NBA). By examining detailed game statistics, this analysis seeks to uncover the relationship between team rebounds and game outcomes.
+This project analyzes how non scoring stat performance affects winning games in the National Basketball Association (NBA). By examining detailed game statistics, this analysis seeks to uncover the relationship between team performance and game outcomes.
 
 ## Project Structure
 The project is organized into several Python scripts, each handling a specific part of the analysis:
